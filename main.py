@@ -23,6 +23,7 @@ big_font = pygame.font.Font(None, 75)
 start_screen = True
 show_inv = False
 Dead = False
+count_frames = True
 
 frames_up = 0
 
@@ -68,7 +69,7 @@ class health_text():
     color = (0, 0, 0)
     text = mid_font.render("Take Damage", True, color)
     posx = pygame_width * 0.33
-    posy = pygame_height / 10
+    posy = pygame_height / 10 * 6
     rect = text.get_rect(topleft=(posx, posy))
 
 def fps_counter():
@@ -101,43 +102,58 @@ def draw_items():
     pygame.draw.rect(screen, boxcolor, (160, 440, 50, 50))
     if slot_2 == "wood":
         pygame.draw.rect(screen, wood, (165, 445, 40, 40))
+    elif slot_2 == "stone":
+        pygame.draw.rect(screen, stone, (165, 445, 40, 40))
+    if slot_2_count > 1:
+        screen.blit((font.render(str(slot_2_count), True, (100, 100, 100))), (195, 465))
     screen.blit((font.render("2", True, (0, 0, 0))), (160, 440))
     pygame.draw.rect(screen, boxcolor, (220, 440, 50, 50))
     if slot_3 == "wood":
         pygame.draw.rect(screen, wood, (225, 445, 40, 40))
+    if slot_3 == "stone":
+        pygame.draw.rect(screen, stone, (225, 445, 40, 40))
+    if slot_3_count > 1:
+        screen.blit((font.render(str(slot_3_count), True, (100, 100, 100))), (255, 465))
     screen.blit((font.render("3", True, (0, 0, 0))), (220, 440))
     pygame.draw.rect(screen, boxcolor, (280, 440, 50, 50))
     if slot_4 == "wood":
         pygame.draw.rect(screen, wood, (285, 445, 40, 40))
+    if slot_4 == "stone":
+        pygame.draw.rect(screen, stone, (285, 445, 40, 40))
+    if slot_4_count > 1:
+        screen.blit((font.render(str(slot_4_count), True, (100, 100, 100))), (315, 465))
     screen.blit((font.render("4", True, (0, 0, 0))), (280, 440))
     pygame.draw.rect(screen, boxcolor, (340, 440, 50, 50))
     if slot_5 == "wood":
         pygame.draw.rect(screen, wood, (345, 445, 40, 40))
+    if slot_5 == "stone":
+        pygame.draw.rect(screen, stone, (345, 445, 40, 40))
+    if slot_5_count > 1:
+        screen.blit((font.render(str(slot_5_count), True, (100, 100, 100))), (375, 465))
     screen.blit((font.render("5", True, (0, 0, 0))), (340, 440))
 
-def get_item(number, item, count):
+def get_item(item, count):
     global slot_1, slot_1_count
     global slot_2, slot_2_count
     global slot_3, slot_3_count
     global slot_4, slot_4_count
     global slot_5, slot_5_count
-    if number == 1:
+    
+    if select_item == 1:
         slot_1 = item
         slot_1_count += count
-    elif number == 2:
+    if select_item == 2:
         slot_2 = item
         slot_2_count += count
-    elif number == 3:
+    if select_item == 3:
         slot_3 = item
         slot_3_count += count
-    elif number == 4:
+    if select_item == 4:
         slot_4 = item
         slot_4_count += count
-    elif number == 5:
+    if select_item == 5:
         slot_5 = item
         slot_5_count += count
-    else:
-        print("Function error!")
 
 def draw_health():
     pygame.draw.rect(screen, (200, 200, 200), (100, 420, total_health * 10, 10))
@@ -168,11 +184,26 @@ def generate():
     x2 = x / 10
     y2 = y / 10
 
-    pygame.draw.rect(screen, (200, 200, 200), (x, y, x2, y2))
 
 def draw_death():
-    global frames_up
-    screen.blit((font.render("Total Frames: " + str(frames_up), True, (0, 0, 0))), (pygame_width / 2, pygame_height / 2))
+    global frames_up, count_frames
+    seconds = frames_up / 30
+    screen.blit((font.render("Total Frames: " + str(frames_up), True, (0, 0, 0))), (pygame_width / 3, pygame_height / 2))
+    screen.blit((font.render("Total Seconds: " + str(seconds), True, (0, 0, 0))), (pygame_width / 3, pygame_height / 5))
+    screen.blit((font.render("Restart the pygame to Restart", True, (0, 0, 0))), (pygame_width / 5, pygame_height / 5 * 4))
+    count_frames = False
+
+def draw_inv():
+    pygame.draw.rect(screen, (200, 200, 200), (pygame_width / 5, pygame_height / 5, pygame_width / 5 * 3, pygame_width / 5 * 3))
+    #pygame.draw.rect(screen, (175, 175, 175), (100, 100, 100, 100))
+    screen.blit(test_text.text, (test_text.posx, test_text.posy))
+    screen.blit(health_text.text, (health_text.posx, health_text.posy))
+
+def draw_char():
+    # torso
+    pygame.draw.rect(screen, (0, 160, 150), (200, 150, 50, 100))
+    # head
+    pygame.draw.rect(screen, (255, 153, 0), (200, 100, 50, 50))
 
 
 while True:
@@ -189,7 +220,7 @@ while True:
         if start_screen == False:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if test_text.rect.collidepoint(event.pos):
-                    get_item(1, "wood", 1)
+                    get_item("wood", 1)
                 elif health_text.rect.collidepoint(event.pos):
                     minus_health(1)
             elif event.type == KEYDOWN:
@@ -209,27 +240,28 @@ while True:
 
     screen.fill((255, 255, 255))
     regen_health()
-    frames_up = frames_up + 1
+    if count_frames == True:
+        frames_up = frames_up + 1
 
     if start_screen == True:
         screen.blit(title_text.text, (title_text.posx, title_text.posy))
         screen.blit(start_text.text, (start_text.posx, start_text.posy))
     if start_screen == False:
         draw_items()
-        screen.blit(test_text.text, (test_text.posx, test_text.posy))
-        screen.blit(health_text.text, (health_text.posx, health_text.posy))
         if show_inv == True:
-            pygame.draw.rect(screen, (200, 200, 200), (pygame_width / 5, pygame_height / 5, pygame_width / 5 * 3, pygame_width / 5 * 3))
+            draw_inv()
         draw_health()
         generate()
-    if dead = True:
+        draw_char()
+    if Dead == True:
+        draw_death()
 
     
     if health <= 0:
         print("you dead")
-        start_screen = True
         health = 10
-        dead = True
+        start_screen = "dead"
+        Dead = True
 
     fps_counter()
     clock.tick(fps)
