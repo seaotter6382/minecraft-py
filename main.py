@@ -248,11 +248,11 @@ while True:
         screen.blit(start_text.text, (start_text.posx, start_text.posy))
     if start_screen == False:
         draw_items()
+        draw_char()
         if show_inv == True:
             draw_inv()
         draw_health()
         generate()
-        draw_char()
     if Dead == True:
         draw_death()
 
